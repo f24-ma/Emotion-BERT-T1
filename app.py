@@ -1,22 +1,22 @@
 import streamlit as st
 import torch
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-# Load lightweight model (fast and small)
-model_path = "distilbert-base-uncased"  # or your fine-tuned model path
-model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=4)
-tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+# Load a pretrained emotion model (already fine-tuned)
+model_path = "bhadresh-savani/distilbert-base-uncased-emotion"
+model = AutoModelForSequenceClassification.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(model_path)
 
 # Use GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# Label mapping (must match your dataset)
-id2label = {0: "joy", 1: "anger", 2: "sadness", 3: "neutral"}
+# Label mapping (taken directly from this model)
+id2label = model.config.id2label
 
 # Streamlit interface
 st.title("Emotion Detection App")
-st.write("Enter a sentence below to detect its emotion (fast version).")
+st.write("Enter a sentence below to detect its emotion (high-accuracy pretrained model).")
 
 text = st.text_area("Enter text:")
 
@@ -37,7 +37,7 @@ if st.button("Predict Emotion"):
         confidence = probs[0][pred].item() * 100
         emotion = id2label[pred]
 
-        # Convert numeric confidence to human-friendly label
+        # Convert numeric confidence to text
         if confidence >= 70:
             conf_level = "High confidence"
         elif confidence >= 40:
@@ -45,7 +45,7 @@ if st.button("Predict Emotion"):
         else:
             conf_level = "Low confidence"
 
-        # Show result
+        # Display result
         st.success(f"Predicted emotion: {emotion} ({conf_level}, {confidence:.2f}% sure)")
 
         # Optional: show all probabilities
