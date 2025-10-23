@@ -3,7 +3,7 @@ import torch
 from transformers import BertTokenizer, BertForSequenceClassification
 
 # Load your fine-tuned model
-model_path = "bert_emotion_model"
+model_path = "bert-base-uncased"
 model = BertForSequenceClassification.from_pretrained(model_path)
 tokenizer = BertTokenizer.from_pretrained(model_path)
 
