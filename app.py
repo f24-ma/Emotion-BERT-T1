@@ -3,7 +3,7 @@ import torch
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 
 # Load lightweight model (fast and small)
-model_path = "distilbert-base-uncased"  # or replace with your fine-tuned model path
+model_path = "distilbert-base-uncased"  # or your fine-tuned model path
 model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=4)
 tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
@@ -37,16 +37,16 @@ if st.button("Predict Emotion"):
         confidence = probs[0][pred].item() * 100
         emotion = id2label[pred]
 
-        # Show result
-# Convert numeric confidence to human-friendly label
-if confidence >= 70:
-    conf_level = "High confidence"
-elif confidence >= 40:
-    conf_level = "Medium confidence"
-else:
-    conf_level = "Low confidence"
+        # Convert numeric confidence to human-friendly label
+        if confidence >= 70:
+            conf_level = "High confidence"
+        elif confidence >= 40:
+            conf_level = "Medium confidence"
+        else:
+            conf_level = "Low confidence"
 
-st.success(f"Predicted emotion: {emotion} ({conf_level}, {confidence:.2f}% sure)")
+        # Show result
+        st.success(f"Predicted emotion: {emotion} ({conf_level}, {confidence:.2f}% sure)")
 
         # Optional: show all probabilities
         st.write("Emotion probabilities:")
