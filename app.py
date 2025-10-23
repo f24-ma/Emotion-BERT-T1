@@ -1,33 +1,33 @@
 import streamlit as st
 import torch
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 
-# Load your fine-tuned model (change path if you have your own model)
-model_path = "bert-base-uncased"  # or "yourusername/bert-emotion-model"
-model = BertForSequenceClassification.from_pretrained(model_path, num_labels=4)
-tokenizer = BertTokenizer.from_pretrained(model_path)
+# Load lightweight model (fast and small)
+model_path = "distilbert-base-uncased"  # or replace with your fine-tuned model path
+model = DistilBertForSequenceClassification.from_pretrained(model_path, num_labels=4)
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
 
 # Use GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 
-# Label mapping (must match your training)
+# Label mapping (must match your dataset)
 id2label = {0: "joy", 1: "anger", 2: "sadness", 3: "neutral"}
 
-# Streamlit app interface
+# Streamlit interface
 st.title("Emotion Detection App")
-st.write("Type any sentence below to find out which emotion it expresses.")
+st.write("Enter a sentence below to detect its emotion (fast version).")
 
-text = st.text_area("Enter your text here:")
+text = st.text_area("Enter text:")
 
 if st.button("Predict Emotion"):
-    if text.strip() == "":
+    if not text.strip():
         st.warning("Please enter some text.")
     else:
-        # Tokenize input text
+        # Tokenize and move to device
         inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(device)
 
-        # Model prediction
+        # Predict
         with torch.no_grad():
             outputs = model(**inputs)
 
@@ -37,10 +37,10 @@ if st.button("Predict Emotion"):
         confidence = probs[0][pred].item() * 100
         emotion = id2label[pred]
 
-        # Display result
+        # Show result
         st.success(f"Predicted emotion: {emotion} ({confidence:.2f}% confident)")
 
-        # Show all emotion probabilities
+        # Optional: show all probabilities
         st.write("Emotion probabilities:")
         for i, label in id2label.items():
             st.write(f"{label}: {probs[0][i]*100:.2f}%")
