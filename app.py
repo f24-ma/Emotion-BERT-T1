@@ -38,7 +38,15 @@ if st.button("Predict Emotion"):
         emotion = id2label[pred]
 
         # Show result
-        st.success(f"Predicted emotion: {emotion} ({confidence:.2f}% confident)")
+# Convert numeric confidence to human-friendly label
+if confidence >= 70:
+    conf_level = "High confidence"
+elif confidence >= 40:
+    conf_level = "Medium confidence"
+else:
+    conf_level = "Low confidence"
+
+st.success(f"Predicted emotion: {emotion} ({conf_level}, {confidence:.2f}% sure)")
 
         # Optional: show all probabilities
         st.write("Emotion probabilities:")
